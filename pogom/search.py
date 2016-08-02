@@ -167,7 +167,7 @@ def search_overseer_thread(args, new_location_queue, pause_bit):
                         search_args = (step, (lat, lon, 0))
                         search_items_queue.put(search_args)
             else:
-                for step, step_location in enumerate(generate_location_steps(position, num_steps), 1):
+                for step, step_location in enumerate(generate_location_steps(current_location, args.step_limit), 1):
                     log.debug('Queueing step %d @ %f/%f/%f', step, step_location[0], step_location[1], step_location[2])
                     search_args = (step, step_location)
                     search_items_queue.put(search_args)
