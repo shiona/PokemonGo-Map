@@ -157,11 +157,20 @@ def search_overseer_thread(args, new_location_queue, pause_bit):
         # If there are no search_items_queue either the loop has finished (or been
         # cleared above) -- either way, time to fill it back up
         if search_items_queue.empty():
-            log.debug('Search queue empty, restarting loop')
-            for step, step_location in enumerate(generate_location_steps(current_location, args.step_limit), 1):
-                log.debug('Queueing step %d @ %f/%f/%f', step, step_location[0], step_location[1], step_location[2])
-                search_args = (step, step_location)
-                search_items_queue.put(search_args)
+            if args.scanlocfile:
+                with open(args.scanlocfile) as scf:
+                    for step, l in enumerate(scf):
+                        [lat, lon] = l.split(',');
+                        lat = float(lat.strip())
+                        lon = float(lon.strip())
+                        log.debug('Queueing step %d @ %f/%f/%f', step, lat, lon, 0)
+                        search_args = (step, (lat, lon, 0))
+                        search_items_queue.put(search_args)
+            else:
+                for step, step_location in enumerate(generate_location_steps(position, num_steps), 1):
+                    log.debug('Queueing step %d @ %f/%f/%f', step, step_location[0], step_location[1], step_location[2])
+                    search_args = (step, step_location)
+                    search_items_queue.put(search_args)
         # else:
         #     log.info('Search queue processing, %d items left', search_items_queue.qsize())
 
@@ -181,7 +190,6 @@ def search_worker_thread(args, account, search_items_queue, parse_lock):
 
         # Grab the next thing to search (when available)
         step, step_location = search_items_queue.get()
-
         log.info('Searching step %d, remaining %d', step, search_items_queue.qsize())
 
         # The loop to try very hard to scan this step

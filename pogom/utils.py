@@ -107,6 +107,7 @@ def get_args():
     parser.add_argument('--db-max_connections', help='Max connections for the database', type=int, default=5)
     parser.add_argument('-wh', '--webhook', help='Define URL(s) to POST webhook information to',
                         nargs='*', default=False, dest='webhooks')
+    parser.add_argument('-slf', '--scanlocfile', help='File containing locations to scan')
     parser.set_defaults(DEBUG=False)
 
     args = parser.parse_args()
